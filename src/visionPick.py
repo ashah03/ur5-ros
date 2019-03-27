@@ -79,6 +79,11 @@ JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
 client = actionlib.SimpleActionClient('follow_joint_trajectory', FollowJointTrajectoryAction)
 client.wait_for_server()
 
+try:
+    wait = int(raw_input("How long should it wait..."))
+except:
+    wait = 20
+
 
 g = FollowJointTrajectoryGoal()
 g.trajectory = JointTrajectory()
@@ -87,7 +92,7 @@ joints_pos = joint_states.position
 g.trajectory.joint_names = JOINT_NAMES
 g.trajectory.points = [JointTrajectoryPoint(positions=joints_pos, velocities=[0]*6, time_from_start=rospy.Duration(0))]
 g.trajectory.points.append(
-                JointTrajectoryPoint(positions=Q1, velocities=[0]*6, time_from_start=rospy.Duration(20)))
+                JointTrajectoryPoint(positions=Q1, velocities=[0]*6, time_from_start=rospy.Duration(wait)))
 client.send_goal(g)
 print("waiting for finish")
 client.wait_for_result()
