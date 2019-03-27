@@ -56,6 +56,9 @@ Q2 = [-5.802346740161077, -1.727706257496969, 2.3336830139160156, -2.25130111375
 
 Q3 = [i-j for i, j in zip(Q1, Q2)]
 
+Q5 = [-5.233350698147909, -2.263735596333639, 2.0414814949035645, -1.8042591253863733, -1.5754278341876429, -1.077151123677389]
+Q6 = [-3.9884613196002405, -1.7695258299456995, 1.7130355834960938, -1.5220916906939905, -1.5590489546405237, -1.6418374220477503]
+
 # moveit_commander.roscpp_initialize(sys.argv)
 rospy.init_node('move_group_python_interface_tutorial',
                  anonymous=True)
@@ -84,7 +87,7 @@ joints_pos = joint_states.position
 g.trajectory.joint_names = JOINT_NAMES
 g.trajectory.points = [JointTrajectoryPoint(positions=joints_pos, velocities=[0]*6, time_from_start=rospy.Duration(0))]
 g.trajectory.points.append(
-                JointTrajectoryPoint(positions=Q1, velocities=[0]*6, time_from_start=rospy.Duration(7)))
+                JointTrajectoryPoint(positions=Q1, velocities=[0]*6, time_from_start=rospy.Duration(20)))
 client.send_goal(g)
 print("waiting for finish")
 client.wait_for_result()
@@ -183,6 +186,26 @@ client.wait_for_result()
 print("finished")
 
 grip.close()
+
+g = FollowJointTrajectoryGoal()
+g.trajectory = JointTrajectory()
+joint_states = rospy.wait_for_message("joint_states", JointState)
+joints_pos = joint_states.position
+g.trajectory.joint_names = JOINT_NAMES
+g.trajectory.points = [JointTrajectoryPoint(positions=joints_pos, velocities=[0]*6, time_from_start=rospy.Duration(0))]
+g.trajectory.points.append(
+                JointTrajectoryPoint(positions=Q5, velocities=[0]*6, time_from_start=rospy.Duration(10)))
+g.trajectory.points.append(
+                JointTrajectoryPoint(positions=Q6, velocities=[0]*6, time_from_start=rospy.Duration(20)))
+
+
+print("sending...")
+client.send_goal(g)
+print("waiting for finish")
+client.wait_for_result()
+print("finished")
+
+grip.open()
 
 print rospy.wait_for_message("joint_states", JointState).position
 
