@@ -80,9 +80,9 @@ client = actionlib.SimpleActionClient('follow_joint_trajectory', FollowJointTraj
 client.wait_for_server()
 
 try:
-    wait = int(raw_input("How long should it wait..."))
+   wait = int(raw_input("How long should it wait..."))
 except:
-    wait = 20
+   wait = 20
 
 
 g = FollowJointTrajectoryGoal()
@@ -101,15 +101,20 @@ print("finished")
 time.sleep(0.5)
 
 centroid = get_cork_centroid(get_image())
-x_error = centroid[0] - 308
+#x_adjust = (308-centroid[0])/3
+x_adjust = 0
+x_original = centroid[0]
+x_goal = 308+x_adjust
+x_error = centroid[0] - x_goal
+print("x_goal is {0}".format(x_goal))
 while abs(x_error) > 1:
     print(centroid)
     pose_goal = group.get_current_pose().pose
     #pose_goal.position.x -= 0.005
     #pose_goal.position.y += 0.005
     #x_delta = x_error/3500.0
-    #x_delta = copysign(0.003, x_error)  + x_error/4500.0
-    x_delta = copysign(0.002, x_error) + x_error/5000.0
+    x_delta = copysign(0.003, x_error)  + x_error/4500.0
+    #x_delta = copysign(0.002, x_error) + x_error/5000.0
     print(x_delta)
     pose_goal.position.x -= x_delta
     pose_goal.position.y += x_delta
@@ -119,7 +124,7 @@ while abs(x_error) > 1:
     group.stop()
     group.clear_pose_targets()
     centroid = get_cork_centroid(get_image())
-    x_error = centroid[0] - 308
+    x_error = centroid[0] - x_goal
 
 centroid = get_cork_centroid(get_image())
 y_adjust = (221-centroid[1])/8
@@ -131,8 +136,8 @@ while abs(y_error) > 1:
     pose_goal = group.get_current_pose().pose
     #pose_goal.position.x -= 0.005
     #pose_goal.position.y += 0.005
-    #y_delta = copysign(0.003, y_error) + y_error/4500.0
-    y_delta = copysign(0.002, y_error) + y_error/5000.0
+    y_delta = copysign(0.003, y_error) + y_error/4500.0
+    #y_delta = copysign(0.002, y_error) + y_error/5000.0
     #y_delta = y_error/1400.0
     print(y_delta)
     pose_goal.position.x += y_delta
@@ -161,7 +166,9 @@ joint_states = rospy.wait_for_message("joint_states", JointState)
 joints_pos = joint_states.position
 
 Q4 = [i-j for i, j in zip(joints_pos, Q3)]
-Q4[4] = (Q2[4] + Q4[4])/2
+if x_original > 308:
+    Q4[4] = (Q2[4] + Q4[4])/2
+# Q4[4] = Q2[4]
 
 g.trajectory.joint_names = JOINT_NAMES
 g.trajectory.points = [JointTrajectoryPoint(positions=joints_pos, velocities=[0]*6, time_from_start=rospy.Duration(0))]
@@ -191,6 +198,11 @@ client.wait_for_result()
 print("finished")
 
 grip.close()
+
+# action = raw_input("Continue?")
+# if action != '':
+#     grip.open()
+#     sys.exit(0)
 
 g = FollowJointTrajectoryGoal()
 g.trajectory = JointTrajectory()

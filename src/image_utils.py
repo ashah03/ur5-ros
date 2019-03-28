@@ -50,9 +50,11 @@ def get_cork_centroid(image):
     hsv_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
     hsv_value = hsv_img[0, 0, 0]
 
-    lower = np.array([8, 143, 50])
-    #lower = np.array([8, 120, 25])
-    upper = np.array([32, 201, 255])
+    # lower = np.array([8, 143, 50])
+    # upper = np.array([32, 201, 255])
+
+    lower = np.array([8, 106, 48])
+    upper = np.array([32, 255, 255])
 
     try:
 
