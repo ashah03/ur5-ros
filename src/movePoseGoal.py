@@ -32,9 +32,9 @@ def move_to_pos():
     pose_goal = group.get_current_pose().pose
     print("current location:")
     print(pose_goal)
-    pose_goal.position.x = 0.01
-    pose_goal.position.y = 0.46
-    pose_goal.position.z = 0.3
+    pose_goal.position.x = -0.1
+    pose_goal.position.y = 0.43
+    pose_goal.position.z = 0.4
     print("goal:")
     print(pose_goal)
     group.set_pose_target(pose_goal)

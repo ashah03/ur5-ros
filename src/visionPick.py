@@ -98,7 +98,7 @@ print("waiting for finish")
 client.wait_for_result()
 print("finished")
 
-time.sleep(0.5)
+time.sleep(5)
 
 centroid = get_cork_centroid(get_image())
 #x_adjust = (308-centroid[0])/3
